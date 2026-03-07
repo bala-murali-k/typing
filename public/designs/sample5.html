@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roadmap · Modern Typing Trainer</title>
+  <!-- Google Fonts & Font Awesome (icons) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ----- EXACT HOMEPAGE STYLES (preserved completely) ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.3s ease, border-color 0.2s, color 0.2s;
+    }
+
+    /* light (default) / dark mode variables */
+    :root {
+      --bg: #f9fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --border: #e2e8f0;
+      --accent: #6366f1;
+      --accent-glow: #a5b4fc;
+      --card-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.05), 0 8px 15px -6px rgba(0, 0, 0, 0.02);
+      --navbar-bg: rgba(255,255,255,0.75);
+      --correct: #10b981;
+      --incorrect: #ef4444;
+      --caret-color: #6366f1;
+      
+      /* Timeline specific colors (using existing palette) */
+      --completed: #10b981;
+      --in-progress: #6366f1;
+      --planned: #94a3b8;
+      --completed-bg: rgba(16, 185, 129, 0.1);
+      --in-progress-bg: rgba(99, 102, 241, 0.1);
+      --planned-bg: rgba(148, 163, 184, 0.1);
+    }
+
+    body.dark {
+      --bg: #0b1120;
+      --surface: #1e293b;
+      --text: #e2e8f0;
+      --text-light: #94a3b8;
+      --border: #334155;
+      --accent: #818cf8;
+      --accent-glow: #4f46e5;
+      --card-shadow: 0 20px 30px -10px #02061780, 0 8px 15px -6px #0f172a;
+      --navbar-bg: rgba(30, 41, 59, 0.85);
+      --correct: #34d399;
+      --incorrect: #f87171;
+      --caret-color: #818cf8;
+      
+      /* Timeline specific colors - dark mode */
+      --completed: #34d399;
+      --in-progress: #818cf8;
+      --planned: #64748b;
+      --completed-bg: rgba(52, 211, 153, 0.15);
+      --in-progress-bg: rgba(129, 140, 248, 0.15);
+      --planned-bg: rgba(100, 116, 139, 0.15);
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* glassmorphism nav (identical) */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+      background: var(--navbar-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.8rem 2rem;
+    }
+
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--accent), #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-menu a {
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 500;
+      transition: 0.2s;
+    }
+    .nav-menu a:hover { color: var(--accent); }
+    .nav-menu a.active {
+      color: var(--accent);
+      position: relative;
+    }
+    .nav-menu a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .theme-toggle {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      width: 2.5rem;
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--card-shadow);
+      color: var(--text);
+      font-size: 1.2rem;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px -3px var(--accent-glow);
+      transition: transform 0.15s, box-shadow 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .btn:hover { transform: scale(1.02); box-shadow: 0 10px 20px -7px var(--accent); }
+
+    /* hamburger mobile */
+    .hamburger {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: var(--text);
+    }
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: var(--surface);
+      padding: 1.5rem;
+      border-radius: 1.5rem;
+      gap: 1rem;
+      margin-top: 1rem;
+      border: 1px solid var(--border);
+    }
+    .mobile-menu a { 
+      text-decoration: none; 
+      color: var(--text); 
+      font-weight: 500;
+      padding: 0.5rem;
+    }
+    .mobile-menu a.active {
+      color: var(--accent);
+    }
+
+    /* main container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 2rem 3rem;
+    }
+
+    /* Hero section for timeline */
+    .timeline-hero {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .timeline-hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      background: linear-gradient(to right, var(--text), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+    .timeline-hero p {
+      font-size: 1.2rem;
+      color: var(--text-light);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Status badges (reusing button styles) */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+    }
+    .status-badge.completed {
+      background: var(--completed-bg);
+      color: var(--completed);
+      border-color: var(--completed);
+    }
+    .status-badge.in-progress {
+      background: var(--in-progress-bg);
+      color: var(--in-progress);
+      border-color: var(--in-progress);
+    }
+    .status-badge.planned {
+      background: var(--planned-bg);
+      color: var(--planned);
+      border-color: var(--planned);
+    }
+
+    /* ----- TIMELINE SPECIFIC STYLES (matching theme) ----- */
+    .timeline {
+      position: relative;
+      padding: 2rem 0;
+    }
+
+    /* Vertical line */
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(to bottom, 
+        var(--completed) 0%,
+        var(--completed) 33%,
+        var(--in-progress) 33%,
+        var(--in-progress) 66%,
+        var(--planned) 66%,
+        var(--planned) 100%
+      );
+      border-radius: 3px;
+      opacity: 0.3;
+    }
+
+    .timeline-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .timeline-item:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+
+    .timeline-content {
+      width: 45%;
+      background: var(--surface);
+      border-radius: 2rem;
+      padding: 1.8rem;
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+
+    .timeline-content:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 35px -12px var(--accent-glow);
+    }
+
+    /* Timeline node */
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 3px solid;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .timeline-item.completed::before {
+      border-color: var(--completed);
+      background: var(--completed);
+      box-shadow: 0 0 0 4px var(--completed-bg);
+    }
+
+    .timeline-item.in-progress::before {
+      border-color: var(--in-progress);
+      background: var(--in-progress);
+      box-shadow: 0 0 0 4px var(--in-progress-bg);
+      animation: pulse 2s infinite;
+    }
+
+    .timeline-item.planned::before {
+      border-color: var(--planned);
+      background: var(--planned);
+      box-shadow: 0 0 0 4px var(--planned-bg);
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 var(--in-progress-bg); }
+      70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+    }
+
+    /* Feature header */
+    .feature-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .feature-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .feature-date {
+      color: var(--text-light);
+      font-size: 0.9rem;
+      background: var(--bg);
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      border: 1px solid var(--border);
+    }
+
+    .feature-description {
+      color: var(--text-light);
+      margin: 1rem 0;
+      line-height: 1.6;
+    }
+
+    /* Progress bar for "In Progress" items */
+    .progress-container {
+      margin-top: 1.2rem;
+      padding: 1rem;
+      background: var(--bg);
+      border-radius: 1.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--in-progress), #a78bfa);
+      border-radius: 10px;
+      transition: width 1s ease;
+      width: 0%;
+    }
+
+    /* Features grid for timeline groups */
+    .timeline-group {
+      margin-bottom: 4rem;
+    }
+
+    .group-title {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .group-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      background: var(--surface);
+      border: 2px solid;
+      box-shadow: var(--card-shadow);
+    }
+
+    .group-icon.completed {
+      border-color: var(--completed);
+      color: var(--completed);
+    }
+    .group-icon.in-progress {
+      border-color: var(--in-progress);
+      color: var(--in-progress);
+    }
+    .group-icon.planned {
+      border-color: var(--planned);
+      color: var(--planned);
+    }
+
+    .group-title h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(to right, var(--text), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Alternative mobile timeline */
+    .mobile-timeline {
+      display: none;
+    }
+
+    /* Stats card for summary */
+    .stats-card {
+      background: var(--surface);
+      border-radius: 2rem;
+      padding: 2rem;
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
+      margin: 3rem 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+
+    .stat-block {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--text-light);
+      font-size: 0.95rem;
+    }
+
+    /* footer (identical) */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem 1.5rem;
+      margin-top: 4rem;
+      background: var(--surface);
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    .social i { 
+      font-size: 1.5rem; 
+      margin-right: 1rem; 
+      color: var(--text-light);
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+    .social i:hover { color: var(--accent); }
+    .copyright { text-align: center; margin-top: 3rem; color: var(--text-light); }
+
+    /* Scroll reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      .nav-menu { display: none; }
+      .hamburger { display: block; }
+      .mobile-menu.show { display: flex; }
+      .navbar { padding: 0.8rem 1rem; }
+      
+      /* Timeline responsive */
+      .timeline::before { left: 30px; }
+      
+      .timeline-item {
+        flex-direction: column !important;
+        margin-left: 60px;
+      }
+      
+      .timeline-content {
+        width: 100%;
+      }
+      
+      .timeline-item::before {
+        left: 30px;
+      }
+      
+      .feature-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .timeline-hero h1 {
+        font-size: 2.3rem;
+      }
+      
+      .stats-card {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- EXACT SAME NAVBAR WITH UPDATED MENU -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <span class="logo">⌨️ Modern Typing Trainer</span>
+      <div class="nav-menu">
+        <a href="#">Home</a>
+        <a href="#">Practice</a>
+        <a href="#" class="active">Timeline</a>
+        <a href="#">About</a>
+      </div>
+      <div class="nav-actions">
+        <div class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></div>
+        <a class="btn" href="#">Start Typing</a>
+        <div class="hamburger" id="hamburger"><i class="fas fa-bars"></i></div>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#">Home</a>
+      <a href="#">Practice</a>
+      <a href="#" class="active">Timeline</a>
+      <a href="#">About</a>
+      <a class="btn btn-outline" href="#">Start Typing</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <!-- Timeline Hero -->
+    <section class="timeline-hero reveal">
+      <h1>Development Roadmap</h1>
+      <p>Follow our journey as we build the ultimate typing experience. See what's completed, what we're working on, and what's coming next.</p>
+    </section>
+
+    <!-- Stats Summary Card -->
+    <div class="stats-card reveal">
+      <div class="stat-block">
+        <div class="stat-number">12</div>
+        <div class="stat-label">Completed Features</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number">3</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number">8</div>
+        <div class="stat-label">Planned</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number">Q2 2025</div>
+        <div class="stat-label">Next Release</div>
+      </div>
+    </div>
+
+    <!-- Desktop Timeline -->
+    <div class="timeline">
+      <!-- Completed Section -->
+      <div class="timeline-item completed reveal">
+        <div class="timeline-content">
+          <div class="feature-header">
+            <span class="feature-name">Homepage & UI</span>
+            <span class="feature-date">v1.0.0 · Jan 2025</span>
+          </div>
+          <span class="status-badge completed">
+            <i class="fas fa-check-circle"></i> Completed
+          </span>
+          <p class="feature-description">
+            Modern, responsive homepage with glassmorphism navbar, dark/light mode, and intuitive layout. 
+            Foundation of the typing trainer experience.
+          </p>
+        </div>
+      </div>
+
+      <div class="timeline-item completed reveal">
+        <div class="timeline-content">
+          <div class="feature-header">
+            <span class="feature-name">Typing Engine</span>
+            <span class="feature-date">v1.1.0 · Feb 2025</span>
+          </div>
+          <span class="status-badge completed">
+            <i class="fas fa-check-circle"></i> Completed
+          </span>
+          <p class="feature-description">
+            Core typing functionality with real-time character highlighting, WPM calculation, 
+            and accuracy tracking. Supports multiple paragraphs and timer modes.
+          </p>
+        </div>
+      </div>
+
+      <div class="timeline-item completed reveal">
+        <div class="timeline-content">
+          <div class="feature-header">
+            <span class="feature-name">Progress Tracking</span>
+            <span class="feature-date">v1.2.0 · Mar 2025</span>
+          </div>
+          <span class="status-badge completed">
+            <i class="fas fa-check-circle"></i> Completed
+          </span>
+          <p class="feature-description">
+            Session results modal with detailed stats, progress bars, and performance 
+            metrics to help users track improvement over time.
+          </p>
+        </div>
+      </div>
+
+      <!-- In Progress Section -->
+      <div class="timeline-item in-progress reveal">
+        <div class="timeline-content">
+          <div class="feature-header">
+            <span class="feature-name">Analytics Dashboard</span>
+            <span class="feature-date">v2.0.0 · Q2 2025</span>
+          </div>
+          <span class="status-badge in-progress">
+            <i class="fas fa-spinner fa-pulse"></i> In Progress
+          </span>
+          <p class="feature-description">
+            Comprehensive typing analytics including speed graphs, accuracy trends, 
+            error pattern analysis, and personal bests tracking.
+          </p>
+          <div class="progress-container">
+            <div class="progress-header">
+              <span>Development progress</span>
+              <span>65%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 65%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Planned Section -->
+      <div class="timeline-item planned reveal">
+        <div class="timeline-content">
+          <div class="feature-header">
+            <span class="feature-name">Leaderboard System</span>
+            <span class="feature-date">v2.1.0 · Q3 2025</span>
+          </div>
+          <span class="status-badge planned">
+            <i class="fas fa-clock"></i> Planned
+          </span>
+          <p class="feature-description">
+            Global and friend-based leaderboards with daily, weekly, and all-time rankings. 
+            Compete with typists worldwide.
+          </p>
+        </div>
+      </div>
+
+      <div class="timeline-item planned reveal">
+        <div class="timeline-content">
+          <div class="feature-header">
+            <span class="feature-name">Multiplayer Mode</span>
+            <span class="feature-date">v2.2.0 · Q4 2025</span>
+          </div>
+          <span class="status-badge planned">
+            <i class="fas fa-clock"></i> Planned
+          </span>
+          <p class="feature-description">
+            Real-time typing races against friends or random opponents. 
+            Chat, spectate, and participate in typing tournaments.
+          </p>
+        </div>
+      </div>
+
+      <div class="timeline-item planned reveal">
+        <div class="timeline-content">
+          <div class="feature-header">
+            <span class="feature-name">User Profiles</span>
+            <span class="feature-date">v2.3.0 · Q1 2026</span>
+          </div>
+          <span class="status-badge planned">
+            <i class="fas fa-clock"></i> Planned
+          </span>
+          <p class="feature-description">
+            Customizable user profiles with typing statistics, achievement showcases, 
+            and personal best records. Connect with other typists.
+          </p>
+        </div>
+      </div>
+
+      <div class="timeline-item planned reveal">
+        <div class="timeline-content">
+          <div class="feature-header">
+            <span class="feature-name">Achievement System</span>
+            <span class="feature-date">v2.4.0 · Q2 2026</span>
+          </div>
+          <span class="status-badge planned">
+            <i class="fas fa-clock"></i> Planned
+          </span>
+          <p class="feature-description">
+            50+ achievements to unlock, from speed milestones to consistency streaks. 
+            Badges and rewards for dedicated typists.
+          </p>
+        </div>
+      </div>
+
+      <div class="timeline-item planned reveal">
+        <div class="timeline-content">
+          <div class="feature-header">
+            <span class="feature-name">Custom Paragraphs</span>
+            <span class="feature-date">v2.5.0 · Q3 2026</span>
+          </div>
+          <span class="status-badge planned">
+            <i class="fas fa-clock"></i> Planned
+          </span>
+          <p class="feature-description">
+            Upload and practice with custom text, code snippets, or import content 
+            from websites. Share paragraph packs with the community.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature Categories Grid (additional visual) -->
+    <h2 class="section-title reveal" style="margin-top: 4rem;">Feature Categories</h2>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <i class="fas fa-check-circle feature-icon" style="color: var(--completed);"></i>
+        <h3>Core Experience</h3>
+        <p>Typing engine, UI, progress tracking - all completed and polished.</p>
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="status-badge completed">4 features</span>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <i class="fas fa-chart-line feature-icon" style="color: var(--in-progress);"></i>
+        <h3>Analytics & Stats</h3>
+        <p>Deep performance insights and trend analysis coming soon.</p>
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="status-badge in-progress">65% done</span>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <i class="fas fa-users feature-icon" style="color: var(--planned);"></i>
+        <h3>Social Features</h3>
+        <p>Leaderboards, multiplayer, profiles - the future of competitive typing.</p>
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="status-badge planned">5 planned</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer (identical to homepage) -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div>
+        <h4>Modern Typing Trainer</h4>
+        <p>Minimalist typing, maximum flow.</p>
+      </div>
+      <div>
+        <h4>Links</h4>
+        <a href="#">Home</a> · <a href="#">Practice</a> · 
+        <a href="#">Timeline</a> · <a href="#">About</a>
+      </div>
+      <div class="social">
+        <i class="fab fa-twitter"></i>
+        <i class="fab fa-github"></i>
+        <i class="fab fa-discord"></i>
+      </div>
+    </div>
+    <div class="copyright">
+      © 2025 Modern Typing Trainer — all rights reserved
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      // Dark/light mode toggle (exactly as homepage)
+      const themeToggle = document.getElementById('themeToggle');
+      themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        const icon = themeToggle.querySelector('i');
+        if (document.body.classList.contains('dark')) {
+          icon.classList.remove('fa-moon');
+          icon.classList.add('fa-sun');
+        } else {
+          icon.classList.remove('fa-sun');
+          icon.classList.add('fa-moon');
+        }
+      });
+
+      // Hamburger mobile menu
+      const hamburger = document.getElementById('hamburger');
+      const mobileMenu = document.getElementById('mobileMenu');
+      hamburger.addEventListener('click', () => {
+        mobileMenu.classList.toggle('show');
+      });
+
+      // Smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) target.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+
+      // Scroll reveal animation
+      function reveal() {
+        const reveals = document.querySelectorAll('.reveal');
+        
+        reveals.forEach(element => {
+          const windowHeight = window.innerHeight;
+          const elementTop = element.getBoundingClientRect().top;
+          const elementVisible = 150;
+          
+          if (elementTop < windowHeight - elementVisible) {
+            element.classList.add('active');
+          }
+        });
+      }
+
+      window.addEventListener('scroll', reveal);
+      reveal(); // Trigger on load
+
+      // Animate progress bars on scroll
+      const progressBars = document.querySelectorAll('.progress-fill');
+      const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const width = entry.target.style.width;
+            entry.target.style.width = '0%';
+            setTimeout(() => {
+              entry.target.style.width = width;
+            }, 100);
+          }
+        });
+      }, observerOptions);
+
+      progressBars.forEach(bar => observer.observe(bar));
+
+      // Set active state for nav links (simulate current page)
+      const currentLocation = window.location.pathname;
+      const navLinks = document.querySelectorAll('.nav-menu a, .mobile-menu a');
+      
+      navLinks.forEach(link => {
+        if (link.textContent.trim() === 'Timeline') {
+          link.classList.add('active');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
