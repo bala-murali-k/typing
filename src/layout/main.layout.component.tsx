@@ -49,12 +49,13 @@ export default function MainLayout({ }) {
 	
 	return (
 		<Box sx={{ 
-			width: '100vw', 
+			// width: '100vw', 
 			minHeight: '100vh', 
 			bgcolor: 'background.default', 
 			transition: 'background-color 0.3s ease, border-color 0.2s, color 0.2s',
 			display: 'flex',
-			flexDirection: 'column'
+			flexDirection: 'column',
+			fontFamily: theme.typography.fontFamily,
 		}}>
 			{/* Sticky Navbar with Glassmorphism */}
 			<Box
@@ -72,7 +73,7 @@ export default function MainLayout({ }) {
 					borderBottom: '1px solid',
 					borderColor: 'divider',
 					padding: '0.8rem 2rem',
-					width: '100%',
+					maxWidth: 'calc(100vw - 2rem)',
 				}}
 			>
 				<Box
@@ -85,7 +86,6 @@ export default function MainLayout({ }) {
 						width: '100%',
 					}}
 				>
-					{/* Logo with gradient */}
 					<Box
 						sx={{
 							fontWeight: 700,
@@ -96,16 +96,16 @@ export default function MainLayout({ }) {
 							WebkitBackgroundClip: theme.palette.mode === 'highcontrast' ? 'unset' : 'text',
 							WebkitTextFillColor: theme.palette.mode === 'highcontrast' ? '#ffff00' : 'transparent',
 							color: theme.palette.mode === 'highcontrast' ? '#ffff00' : 'inherit',
-							letterSpacing: '-0.02em',
+							letterSpacing: theme.typography.h1?.letterSpacing || '-0.02em',
 							display: 'flex',
 							alignItems: 'center',
 							gap: 1,
+							fontFamily: theme.typography.fontFamily,
 						}}
 					>
-						<span>⌨️</span> Modern Typing Trainer
+						<span style={{ fontFamily: theme.typography.fontFamily }}>⌨️</span> Modern Typing Trainer
 					</Box>
 
-					{/* Desktop Navigation */}
 					<Box
 						sx={{
 							display: { xs: 'none', md: 'flex' },
@@ -122,6 +122,8 @@ export default function MainLayout({ }) {
 									color: theme.palette.text.primary,
 									fontWeight: 500,
 									transition: 'color 0.2s',
+									fontFamily: theme.typography.fontFamily,
+									fontSize: '0.95rem',
 								}}
 								onMouseEnter={(e) => {
 									e.currentTarget.style.color = theme.palette.primary.main;
@@ -135,9 +137,7 @@ export default function MainLayout({ }) {
 						))}
 					</Box>
 
-					{/* Navigation Actions */}
 					<Box sx={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-						{/* Theme Toggle Button */}
 						<Tooltip title="Toggle theme">
 							<IconButton
 								onClick={() => {
@@ -171,7 +171,6 @@ export default function MainLayout({ }) {
 							</IconButton>
 						</Tooltip>
 
-						{/* Start Typing Button */}
 						<Box
 							component={Link}
 							to="/practice"
@@ -188,6 +187,7 @@ export default function MainLayout({ }) {
 								transition: 'transform 0.15s, box-shadow 0.2s',
 								textDecoration: 'none',
 								display: { xs: 'none', sm: 'inline-block' },
+								fontFamily: theme.typography.fontFamily,
 								'&:hover': {
 									transform: 'scale(1.02)',
 									boxShadow: `0 10px 20px -7px ${theme.palette.primary.main}`,
@@ -197,7 +197,6 @@ export default function MainLayout({ }) {
 							Start Typing
 						</Box>
 
-						{/* Hamburger Menu Icon */}
 						<IconButton
 							onClick={() => setMobileMenuOpen(true)}
 							sx={{
@@ -206,7 +205,7 @@ export default function MainLayout({ }) {
 								color: theme.palette.text.primary,
 							}}
 						>
-							<MenuIcon />
+							<MenuIcon sx={{ fontFamily: theme.typography.fontFamily }} />
 						</IconButton>
 					</Box>
 				</Box>
@@ -238,6 +237,7 @@ export default function MainLayout({ }) {
 								fontWeight: 500,
 								fontSize: '1.1rem',
 								padding: '0.5rem 0',
+								fontFamily: theme.typography.fontFamily,
 							}}
 							onClick={() => setMobileMenuOpen(false)}
 						>
@@ -261,6 +261,7 @@ export default function MainLayout({ }) {
 							display: 'inline-block',
 							textAlign: 'center',
 							mt: 1,
+							fontFamily: theme.typography.fontFamily,
 							'&:hover': {
 								borderColor: theme.palette.primary.main,
 								color: theme.palette.primary.main,
@@ -296,7 +297,7 @@ export default function MainLayout({ }) {
 						padding: '3rem 2rem 1.5rem',
 						marginTop: '4rem',
 						background: theme.palette.background.paper,
-						width: '100%',
+						// width: '100%',
 					}}
 				>
 					{/* Footer Content */}
@@ -319,6 +320,8 @@ export default function MainLayout({ }) {
 									fontWeight: 600,
 									color: theme.palette.text.primary,
 									marginBottom: '0.5rem',
+									fontFamily: theme.typography.fontFamily,
+									letterSpacing: 'normal',
 								}}
 							>
 								Modern Typing Trainer
@@ -328,6 +331,10 @@ export default function MainLayout({ }) {
 								sx={{
 									color: theme.palette.text.secondary,
 									fontSize: '0.95rem',
+									fontWeight: 400,
+									fontFamily: theme.typography.fontFamily,
+									lineHeight: 1.6,
+									m: 0,
 								}}
 							>
 								Minimalist typing, maximum flow.
@@ -343,6 +350,8 @@ export default function MainLayout({ }) {
 									fontWeight: 600,
 									color: theme.palette.text.primary,
 									marginBottom: '0.5rem',
+									fontFamily: theme.typography.fontFamily,
+									letterSpacing: 'normal',
 								}}
 							>
 								Links
@@ -354,6 +363,8 @@ export default function MainLayout({ }) {
 										color: theme.palette.text.secondary,
 										textDecoration: 'none',
 										fontSize: '0.95rem',
+										fontWeight: 400,
+										fontFamily: theme.typography.fontFamily,
 									}}
 									onMouseEnter={(e) => {
 										e.currentTarget.style.color = theme.palette.primary.main;
@@ -364,13 +375,18 @@ export default function MainLayout({ }) {
 								>
 									Home
 								</Link>
-								<Box component="span" sx={{ color: theme.palette.text.secondary }}>·</Box>
+								<Box component="span" sx={{ 
+									color: theme.palette.text.secondary,
+									fontFamily: theme.typography.fontFamily,
+								}}>·</Box>
 								<Link
 									to="/features"
 									style={{
 										color: theme.palette.text.secondary,
 										textDecoration: 'none',
 										fontSize: '0.95rem',
+										fontWeight: 400,
+										fontFamily: theme.typography.fontFamily,
 									}}
 									onMouseEnter={(e) => {
 										e.currentTarget.style.color = theme.palette.primary.main;
@@ -381,13 +397,18 @@ export default function MainLayout({ }) {
 								>
 									Features
 								</Link>
-								<Box component="span" sx={{ color: theme.palette.text.secondary }}>·</Box>
+								<Box component="span" sx={{ 
+									color: theme.palette.text.secondary,
+									fontFamily: theme.typography.fontFamily,
+								}}>·</Box>
 								<Link
 									to="/privacy"
 									style={{
 										color: theme.palette.text.secondary,
 										textDecoration: 'none',
 										fontSize: '0.95rem',
+										fontWeight: 400,
+										fontFamily: theme.typography.fontFamily,
 									}}
 									onMouseEnter={(e) => {
 										e.currentTarget.style.color = theme.palette.primary.main;
@@ -418,7 +439,7 @@ export default function MainLayout({ }) {
 										},
 									}}
 								>
-									<TwitterIcon />
+									<TwitterIcon sx={{ fontSize: '1.5rem' }} />
 								</IconButton>
 							</Tooltip>
 							<Tooltip title="GitHub">
@@ -436,7 +457,7 @@ export default function MainLayout({ }) {
 										},
 									}}
 								>
-									<GitHubIcon />
+									<GitHubIcon sx={{ fontSize: '1.5rem' }} />
 								</IconButton>
 							</Tooltip>
 							<Tooltip title="Discord">
@@ -455,7 +476,7 @@ export default function MainLayout({ }) {
 									}}
 								>
 									{/* Using CodeIcon as fallback for Discord until you create a custom icon */}
-									<CodeIcon />
+									<CodeIcon sx={{ fontSize: '1.5rem' }} />
 								</IconButton>
 							</Tooltip>
 						</Box>
@@ -468,6 +489,9 @@ export default function MainLayout({ }) {
 							marginTop: '3rem',
 							color: theme.palette.text.secondary,
 							fontSize: '0.9rem',
+							fontWeight: 400,
+							fontFamily: theme.typography.fontFamily,
+							letterSpacing: 'normal',
 						}}
 					>
 						© 2025 Modern Typing Trainer — all rights reserved
