@@ -3,86 +3,61 @@ import { Box, useTheme } from '@mui/material'
 import { useContext, useState, useEffect, useRef } from 'react'
 import { ThemeContext } from '../../../context/theme/theme.context.component'
 
+
 export function QuicktestSectionHomePageComponent() {
-    const { currentTheme } = useContext(ThemeContext)
-    const theme = useTheme()
+    // Fix Issue 1: Handle null context
+    const themeContext = useContext(ThemeContext)
+    
+    // Throw error if context is null (should never happen if used within provider)
+    if (!themeContext) {
+        throw new Error('QuicktestSectionHomePageComponent must be used within a ThemeContextComponent')
+    }
+    
+    const { currentTheme } = themeContext
+    const muiTheme = useTheme()
 
     // Typing test state
-    const [paragraphs] = useState([
+    const [paragraphs] = useState<string[]>([
         "The sun dipped below the horizon, painting the sky in shades of orange and purple. A gentle breeze rustled the leaves, carrying the scent of pine and distant rain.",
         "Typing fast is not just about speed; it's about rhythm and accuracy. Focus on each keystroke and let your fingers dance across the keyboard.",
         "Minimalist design removes distractions. It brings clarity to your thoughts and helps you concentrate on what truly matters: your progress."
     ])
-    const [currentParagraph, setCurrentParagraph] = useState(paragraphs[0])
-    const [timerMode] = useState(60)
-    const [timeLeft, setTimeLeft] = useState(60)
-    const [active, setActive] = useState(false)
-    const [typed, setTyped] = useState("")
-    const [startTime, setStartTime] = useState(null)
-    const [wpm, setWpm] = useState(0)
-    const [accuracy, setAccuracy] = useState(100)
-    const [errors, setErrors] = useState(0)
-    const [showModal, setShowModal] = useState(false)
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const [currentParagraph] = useState<string>(paragraphs[0]) // Changed from setCurrentParagraph since it's not used
+    const [timerMode] = useState<number>(60)
+    const [timeLeft, setTimeLeft] = useState<number>(60)
+    const [active, setActive] = useState<boolean>(false)
+    const [typed, setTyped] = useState<string>("")
+    const [startTime, setStartTime] = useState<number | null>(null)
+    const [wpm, setWpm] = useState<number>(0)
+    const [accuracy, setAccuracy] = useState<number>(100)
+    const [errors, setErrors] = useState<number>(0)
+    const [showModal, setShowModal] = useState<boolean>(false)
+    // Removed unused mobileMenuOpen state
 
-    // Refs
-    const inputRef = useRef(null)
-    const timerIntervalRef = useRef(null)
-
-    // Helper function to get accent secondary color
-    const getAccentSecondary = () => {
-        switch (currentTheme) {
-            case 'dark':
-                return theme.palette.primary.a20 // #f9c74f
-            case 'highcontrast':
-                return theme.palette.primary.a20 // #ff00ff
-            default:
-                return theme.palette.primary.a40 // #facc15 for light theme
-        }
-    }
-
-    // Helper function for typing animation background
-    const getTypingAnimationBg = () => {
-        switch (currentTheme) {
-            case 'dark':
-                return theme.palette.surface.a30 // #1d253b
-            case 'highcontrast':
-                return '#000'
-            default:
-                return theme.palette.surface.a10 // #ffffff
-        }
-    }
-
-    // Helper function for gradient text
-    const getGradientColors = () => {
-        switch (currentTheme) {
-            case 'dark':
-                return 'linear-gradient(to right, #e2e8f0, #818cf8)'
-            case 'highcontrast':
-                return 'linear-gradient(to right, #ffffff, #ffff00)'
-            default:
-                return 'linear-gradient(to right, #1e293b, #6366f1)'
-        }
-    }
+    // Refs - Fix Issue 2: Properly type the ref
+    const inputRef = useRef<HTMLInputElement>(null)
+    const timerIntervalRef = useRef<number | null>(null)
 
     // Render paragraph with character highlighting
-    const renderParagraph = () => {
+    const renderParagraph = (): string => {
         let html = ''
         for (let i = 0; i < currentParagraph.length; i++) {
             let char = currentParagraph[i]
-            let charClass = 'char'
             if (i < typed.length) {
-                charClass += (typed[i] === char) ? ' correct' : ' incorrect'
+                html += (typed[i] === char) 
+                    ? `<span class="char correct">${char === ' ' ? '&nbsp;' : char}</span>`
+                    : `<span class="char incorrect">${char === ' ' ? '&nbsp;' : char}</span>`
             } else if (i === typed.length) {
-                charClass += ' current'
+                html += `<span class="char current">${char === ' ' ? '&nbsp;' : char}</span>`
+            } else {
+                html += `<span class="char">${char === ' ' ? '&nbsp;' : char}</span>`
             }
-            html += `<span class="${charClass}">${char === ' ' ? '&nbsp;' : char}</span>`
         }
         return html
     }
 
     // Calculate accuracy
-    const calculateAccuracy = () => {
+    const calculateAccuracy = (): number => {
         if (typed.length === 0) return 100
         let correct = 0
         for (let i = 0; i < typed.length; i++) {
@@ -93,8 +68,8 @@ export function QuicktestSectionHomePageComponent() {
         return typed.length ? Math.round((correct / typed.length) * 100) : 100
     }
 
-    // Calculate WPM
-    const calculateWPM = () => {
+    // Calculate WPM - Fix Issue 4: Handle null startTime
+    const calculateWPM = (): number => {
         if (!startTime || typed.length === 0) return 0
         const minutes = (Date.now() - startTime) / 60000
         if (minutes <= 0) return 0
@@ -102,16 +77,24 @@ export function QuicktestSectionHomePageComponent() {
     }
 
     // Finish test
-    const finishTest = () => {
-        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current)
+    const finishTest = (): void => {
+        if (timerIntervalRef.current) {
+            clearInterval(timerIntervalRef.current)
+            timerIntervalRef.current = null
+        }
         setActive(false)
-        if (inputRef.current) inputRef.current.disabled = true
+        if (inputRef.current) {
+            inputRef.current.disabled = true
+        }
         setShowModal(true)
     }
 
     // Reset test
-    const resetTest = () => {
-        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current)
+    const resetTest = (): void => {
+        if (timerIntervalRef.current) {
+            clearInterval(timerIntervalRef.current)
+            timerIntervalRef.current = null
+        }
         setActive(false)
         setTyped("")
         setStartTime(null)
@@ -127,26 +110,37 @@ export function QuicktestSectionHomePageComponent() {
         }
     }
 
-    // Start timer
-    const startTimer = () => {
-        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current)
-        setStartTime(Date.now())
-        setTimeLeft(timerMode)
+    // Start timer - Fix Issue 3: startTime null issue
+    const startTimer = (): void => {
+        if (timerIntervalRef.current) {
+            clearInterval(timerIntervalRef.current)
+            timerIntervalRef.current = null
+        }
+        
+        const now = Date.now()
+        setStartTime(now)
 
-        timerIntervalRef.current = setInterval(() => {
+        timerIntervalRef.current = window.setInterval(() => {
             if (!active) return
-            const elapsed = (Date.now() - startTime) / 1000
-            const remaining = Math.max(0, Math.round(timerMode - elapsed))
-            setTimeLeft(remaining)
             
-            if (remaining <= 0) {
-                finishTest()
-            }
+            // Use the current startTime from state, not the closure variable
+            setStartTime(prevStartTime => {
+                if (!prevStartTime) return prevStartTime
+                
+                const elapsed = (Date.now() - prevStartTime) / 1000
+                const remaining = Math.max(0, Math.round(timerMode - elapsed))
+                setTimeLeft(remaining)
+                
+                if (remaining <= 0) {
+                    finishTest()
+                }
+                return prevStartTime
+            })
         }, 200)
     }
 
-    // Handle input change
-    const handleInputChange = (e) => {
+    // Handle input change - Fix Issue 5: Type the event parameter
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const value = e.target.value
 
         if (!active && value.length > 0) {
@@ -176,21 +170,18 @@ export function QuicktestSectionHomePageComponent() {
     // Cleanup timer on unmount
     useEffect(() => {
         return () => {
-            if (timerIntervalRef.current) clearInterval(timerIntervalRef.current)
+            if (timerIntervalRef.current) {
+                clearInterval(timerIntervalRef.current)
+            }
         }
     }, [])
 
     // Focus input on mount
     useEffect(() => {
-        if (inputRef.current) inputRef.current.focus()
+        if (inputRef.current) {
+            inputRef.current.focus()
+        }
     }, [])
-
-    // Toggle theme
-    const toggleTheme = () => {
-        // This would need to be implemented in your ThemeContext
-        // For now, just toggle a class or emit an event
-        document.body.classList.toggle('dark')
-    }
 
     return (
         <Box>
@@ -198,9 +189,7 @@ export function QuicktestSectionHomePageComponent() {
             <Box
                 className="container"
                 sx={{
-                    // maxWidth: '1200px',
                     margin: '0 auto',
-                    // padding: '2rem 2rem 3rem'
                 }}
             >
 
@@ -209,12 +198,12 @@ export function QuicktestSectionHomePageComponent() {
                     id="quick-test"
                     className="test-section"
                     sx={{
-                        background: theme.palette.background.paper,
+                        background: muiTheme.palette.background.paper,
                         borderRadius: '2rem',
                         padding: '2rem',
-                        boxShadow: theme.shadows[3],
+                        boxShadow: muiTheme.shadows[3],
                         border: '1px solid',
-                        borderColor: theme.palette.divider,
+                        borderColor: muiTheme.palette.divider,
                         margin: '4rem 0'
                     }}
                 >
@@ -230,42 +219,46 @@ export function QuicktestSectionHomePageComponent() {
                             marginBottom: '1.8rem'
                         }}
                     >
-                        <Box className="stat-item" sx={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', background: theme.palette.background.default, padding: '0.5rem 1.2rem', borderRadius: '40px' }}>
-                            <span className="stat-label" style={{ color: theme.palette.text.secondary, fontWeight: 500 }}>WPM</span>
-                            <span className="stat-value" style={{ fontWeight: 700, fontSize: '1.6rem', color: theme.palette.primary.main }}>{wpm}</span>
+                        <Box className="stat-item" sx={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', background: muiTheme.palette.background.default, padding: '0.5rem 1.2rem', borderRadius: '40px' }}>
+                            <span className="stat-label" style={{ color: muiTheme.palette.text.secondary, fontWeight: 500 }}>WPM</span>
+                            <span className="stat-value" style={{ fontWeight: 700, fontSize: '1.6rem', color: muiTheme.palette.primary.main }}>{wpm}</span>
                         </Box>
-                        <Box className="stat-item" sx={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', background: theme.palette.background.default, padding: '0.5rem 1.2rem', borderRadius: '40px' }}>
-                            <span className="stat-label" style={{ color: theme.palette.text.secondary, fontWeight: 500 }}>Acc</span>
-                            <span className="stat-value" style={{ fontWeight: 700, fontSize: '1.6rem', color: theme.palette.primary.main }}>{accuracy}</span>%
+                        <Box className="stat-item" sx={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', background: muiTheme.palette.background.default, padding: '0.5rem 1.2rem', borderRadius: '40px' }}>
+                            <span className="stat-label" style={{ color: muiTheme.palette.text.secondary, fontWeight: 500 }}>Acc</span>
+                            <span className="stat-value" style={{ fontWeight: 700, fontSize: '1.6rem', color: muiTheme.palette.primary.main }}>{accuracy}</span>%
                         </Box>
-                        <Box className="stat-item" sx={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', background: theme.palette.background.default, padding: '0.5rem 1.2rem', borderRadius: '40px' }}>
-                            <span className="stat-label" style={{ color: theme.palette.text.secondary, fontWeight: 500 }}>⏱️</span>
-                            <span className="stat-value" style={{ fontWeight: 700, fontSize: '1.6rem', color: theme.palette.primary.main }}>{timeLeft}s</span>
+                        <Box className="stat-item" sx={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', background: muiTheme.palette.background.default, padding: '0.5rem 1.2rem', borderRadius: '40px' }}>
+                            <span className="stat-label" style={{ color: muiTheme.palette.text.secondary, fontWeight: 500 }}>⏱️</span>
+                            <span className="stat-value" style={{ fontWeight: 700, fontSize: '1.6rem', color: muiTheme.palette.primary.main }}>{timeLeft}s</span>
                         </Box>
-                        <button
+                        <Box
+                            component="button"
                             className="restart-btn"
                             onClick={resetTest}
-                            style={{
-                                background: theme.palette.background.default,
-                                border: `1px solid ${theme.palette.divider}`,
+                            sx={{
+                                background: muiTheme.palette.background.default,
+                                border: `1px solid ${muiTheme.palette.divider}`,
                                 borderRadius: '40px',
                                 padding: '0.7rem 1.8rem',
                                 cursor: 'pointer',
                                 fontWeight: 600,
-                                color: theme.palette.text.primary
+                                color: muiTheme.palette.text.primary,
+                                '&:hover': {
+                                    background: muiTheme.palette.action.hover,
+                                }
                             }}
                         >
                             <i className="fas fa-redo-alt"></i> Restart
-                        </button>
+                        </Box>
                     </Box>
 
                     {/* Timer Progress */}
-                    <Box className="timer-progress" sx={{ height: '8px', background: theme.palette.divider, borderRadius: '10px', width: '100%', margin: '1rem 0 1.5rem' }}>
+                    <Box className="timer-progress" sx={{ height: '8px', background: muiTheme.palette.divider, borderRadius: '10px', width: '100%', margin: '1rem 0 1.5rem' }}>
                         <Box
                             className="progress-fill"
                             sx={{
                                 height: '8px',
-                                background: `linear-gradient(90deg, ${theme.palette.primary.main}, #a78bfa)`,
+                                background: `linear-gradient(90deg, ${muiTheme.palette.primary.main}, #a78bfa)`,
                                 width: `${((timerMode - timeLeft) / timerMode) * 100}%`,
                                 borderRadius: '10px',
                                 transition: 'width 0.1s linear'
@@ -277,41 +270,41 @@ export function QuicktestSectionHomePageComponent() {
                     <Box
                         className="paragraph-display"
                         sx={{
-                            background: theme.palette.background.default,
+                            background: muiTheme.palette.background.default,
                             padding: '2rem',
                             borderRadius: '2rem',
                             fontSize: '1.3rem',
                             lineHeight: 1.8,
                             margin: '1rem 0 1.5rem',
                             border: '1px solid',
-                            borderColor: theme.palette.divider,
+                            borderColor: muiTheme.palette.divider,
                             fontWeight: 400,
                             wordBreak: 'break-word',
-                            color: theme.palette.text.primary, // Base text color now theme-aware
+                            color: muiTheme.palette.text.primary,
                             '& .char': { 
                                 display: 'inline-block', 
                                 whiteSpace: 'pre-wrap',
-                                color: 'inherit' // Inherit base color by default
+                                color: 'inherit'
                             },
                             '& .char.correct': { 
                                 color: (() => {
                                     switch(currentTheme) {
                                         case 'dark':
-                                            return '#4ade80' // Bright green for dark mode
+                                            return '#4ade80'
                                         case 'highcontrast':
-                                            return '#00ff00' // Pure green for high contrast
+                                            return '#00ff00'
                                         default:
-                                            return '#10b981' // Original green for light mode
+                                            return '#10b981'
                                     }
                                 })(),
                                 background: (() => {
                                     switch(currentTheme) {
                                         case 'dark':
-                                            return 'rgba(74,222,128,0.2)' // More visible in dark mode
+                                            return 'rgba(74,222,128,0.2)'
                                         case 'highcontrast':
-                                            return 'rgba(0,255,0,0.3)' // High contrast background
+                                            return 'rgba(0,255,0,0.3)'
                                         default:
-                                            return 'rgba(16,185,129,0.1)' // Original light mode
+                                            return 'rgba(16,185,129,0.1)'
                                     }
                                 })(),
                                 borderRadius: '2px'
@@ -320,21 +313,21 @@ export function QuicktestSectionHomePageComponent() {
                                 color: (() => {
                                     switch(currentTheme) {
                                         case 'dark':
-                                            return '#f87171' // Bright red for dark mode
+                                            return '#f87171'
                                         case 'highcontrast':
-                                            return '#ffff00' // Yellow for high contrast (more visible than red)
+                                            return '#ffff00'
                                         default:
-                                            return '#ef4444' // Original red for light mode
+                                            return '#ef4444'
                                     }
                                 })(),
                                 background: (() => {
                                     switch(currentTheme) {
                                         case 'dark':
-                                            return 'rgba(248,113,113,0.2)' // More visible in dark mode
+                                            return 'rgba(248,113,113,0.2)'
                                         case 'highcontrast':
-                                            return 'rgba(255,255,0,0.3)' // Yellow background for high contrast
+                                            return 'rgba(255,255,0,0.3)'
                                         default:
-                                            return 'rgba(239,68,68,0.1)' // Original light mode
+                                            return 'rgba(239,68,68,0.1)'
                                     }
                                 })(),
                                 textDecoration: (() => {
@@ -352,21 +345,21 @@ export function QuicktestSectionHomePageComponent() {
                                 background: (() => {
                                     switch(currentTheme) {
                                         case 'dark':
-                                            return theme.palette.primary.main // #818cf8
+                                            return muiTheme.palette.primary.main
                                         case 'highcontrast':
-                                            return '#ff00ff' // Bright magenta for high contrast
+                                            return '#ff00ff'
                                         default:
-                                            return theme.palette.primary.main // #6366f1 for light
+                                            return muiTheme.palette.primary.main
                                     }
                                 })(),
                                 color: (() => {
                                     switch(currentTheme) {
                                         case 'dark':
-                                            return '#0b1120' // Dark background color for contrast
+                                            return '#0b1120'
                                         case 'highcontrast':
-                                            return '#000000' // Black for maximum contrast
+                                            return '#000000'
                                         default:
-                                            return '#ffffff' // White for light theme
+                                            return '#ffffff'
                                     }
                                 })(),
                                 borderRadius: '3px',
@@ -378,9 +371,8 @@ export function QuicktestSectionHomePageComponent() {
                                     '100%': { opacity: 1 }
                                 }
                             },
-                            // Style for untyped characters (future characters)
                             '& .char:not(.correct):not(.incorrect):not(.current)': {
-                                color: theme.palette.text.secondary, // Softer color for untyped characters
+                                color: muiTheme.palette.text.secondary,
                                 opacity: currentTheme === 'dark' ? 0.8 : 0.7
                             }
                         }}
@@ -402,24 +394,24 @@ export function QuicktestSectionHomePageComponent() {
                             fontSize: '1.2rem',
                             borderRadius: '60px',
                             border: '2px solid',
-                            borderColor: theme.palette.divider,
-                            background: theme.palette.background.default,
-                            color: theme.palette.text.primary,
+                            borderColor: muiTheme.palette.divider,
+                            background: muiTheme.palette.background.default,
+                            color: muiTheme.palette.text.primary,
                             outline: 'none',
                             margin: '1rem 0',
-                            boxSizing: 'border-box' // Add this line
+                            boxSizing: 'border-box'
                         }}
-                        onFocus={(e) => e.target.style.borderColor = theme.palette.primary.main}
-                        onBlur={(e) => e.target.style.borderColor = theme.palette.divider}
+                        onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.style.borderColor = muiTheme.palette.primary.main}
+                        onBlur={(e: React.FocusEvent<HTMLInputElement>) => e.target.style.borderColor = muiTheme.palette.divider}
                     />
 
                     {/* Progress bar under input */}
-                    <Box sx={{ height: '6px', background: theme.palette.divider, borderRadius: '10px', margin: '1rem 0' }}>
+                    <Box sx={{ height: '6px', background: muiTheme.palette.divider, borderRadius: '10px', margin: '1rem 0' }}>
                         <Box
                             id="typeProgress"
                             sx={{
                                 height: '6px',
-                                background: theme.palette.primary.main,
+                                background: muiTheme.palette.primary.main,
                                 width: `${(typed.length / currentParagraph.length) * 100}%`,
                                 borderRadius: '10px',
                                 transition: 'width 0.1s ease'
@@ -448,67 +440,75 @@ export function QuicktestSectionHomePageComponent() {
                     }}
                 >
                     <Box className="modal-content" sx={{
-                        background: theme.palette.background.paper,
+                        background: muiTheme.palette.background.paper,
                         borderRadius: '2.5rem',
                         padding: '2.5rem',
                         maxWidth: '400px',
                         width: '90%',
                         border: '1px solid',
-                        borderColor: theme.palette.divider,
-                        boxShadow: theme.shadows[3],
+                        borderColor: muiTheme.palette.divider,
+                        boxShadow: muiTheme.shadows[3],
                         textAlign: 'center'
                     }}>
-                        <h2>📊 Test finished!</h2>
+                        <h2 style={{ color: muiTheme.palette.text.primary }}>📊 Test finished!</h2>
                         <Box className="modal-stats" sx={{ margin: '2rem 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                             <Box>
-                                <span className="stat-label" style={{ color: theme.palette.text.secondary, fontWeight: 500 }}>WPM</span>
-                                <div style={{ fontWeight: 700, fontSize: '1.2rem' }}>{wpm}</div>
+                                <span className="stat-label" style={{ color: muiTheme.palette.text.secondary, fontWeight: 500 }}>WPM</span>
+                                <div style={{ fontWeight: 700, fontSize: '1.2rem', color: muiTheme.palette.text.primary }}>{wpm}</div>
                             </Box>
                             <Box>
-                                <span className="stat-label" style={{ color: theme.palette.text.secondary, fontWeight: 500 }}>Accuracy</span>
-                                <div style={{ fontWeight: 700, fontSize: '1.2rem' }}>{accuracy}%</div>
+                                <span className="stat-label" style={{ color: muiTheme.palette.text.secondary, fontWeight: 500 }}>Accuracy</span>
+                                <div style={{ fontWeight: 700, fontSize: '1.2rem', color: muiTheme.palette.text.primary }}>{accuracy}%</div>
                             </Box>
                             <Box>
-                                <span className="stat-label" style={{ color: theme.palette.text.secondary, fontWeight: 500 }}>Chars</span>
-                                <div style={{ fontWeight: 700, fontSize: '1.2rem' }}>{typed.length}</div>
+                                <span className="stat-label" style={{ color: muiTheme.palette.text.secondary, fontWeight: 500 }}>Chars</span>
+                                <div style={{ fontWeight: 700, fontSize: '1.2rem', color: muiTheme.palette.text.primary }}>{typed.length}</div>
                             </Box>
                             <Box>
-                                <span className="stat-label" style={{ color: theme.palette.text.secondary, fontWeight: 500 }}>Errors</span>
-                                <div style={{ fontWeight: 700, fontSize: '1.2rem' }}>{errors}</div>
+                                <span className="stat-label" style={{ color: muiTheme.palette.text.secondary, fontWeight: 500 }}>Errors</span>
+                                <div style={{ fontWeight: 700, fontSize: '1.2rem', color: muiTheme.palette.text.primary }}>{errors}</div>
                             </Box>
                         </Box>
                         <Box sx={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                            <button
+                            <Box
+                                component="button"
                                 className="btn"
                                 onClick={resetTest}
-                                style={{
-                                    background: theme.palette.primary.main,
+                                sx={{
+                                    background: muiTheme.palette.primary.main,
                                     color: '#fff',
                                     border: 'none',
                                     padding: '0.6rem 1.4rem',
                                     borderRadius: '40px',
                                     fontWeight: 600,
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                        background: muiTheme.palette.primary.dark,
+                                    }
                                 }}
                             >
                                 Restart test
-                            </button>
-                            <button
+                            </Box>
+                            <Box
+                                component="button"
                                 className="btn btn-outline"
                                 onClick={() => setShowModal(false)}
-                                style={{
+                                sx={{
                                     background: 'transparent',
-                                    color: theme.palette.text.primary,
+                                    color: muiTheme.palette.text.primary,
                                     border: '1px solid',
-                                    borderColor: theme.palette.divider,
+                                    borderColor: muiTheme.palette.divider,
                                     padding: '0.6rem 1.4rem',
                                     borderRadius: '40px',
                                     fontWeight: 600,
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                        background: muiTheme.palette.action.hover,
+                                    }
                                 }}
                             >
                                 Close
-                            </button>
+                            </Box>
                         </Box>
                     </Box>
                 </Box>

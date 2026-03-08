@@ -4,7 +4,7 @@ import { Routes, Route } from 'react-router-dom'
 // Component Imports
 import MainLayout from './layout/main.layout.component.tsx'
 import HomePage from './pages/home/index.tsx'
-// import WorkPage from './pages/work/index.tsx'
+import FeaturePage from './pages/features/index.tsx'
 import ThemeContextComponent from './context/theme/theme.context.component.tsx'
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
 			}
 		>
 			<Route path="" element={<HomePage />} />
-			{/* <Route path="" element={<>this is the home component</>} /> */}
+			<Route path="/features" element={<FeaturePage />} />
 			<Route path="*" element={ <>This is the error page for this.</> } />
 			{/* <Route path="/work" element={ <WorkPage /> } /> */}
 			{/* <Route path="/work" element={ <WorkPage /> } /> */}
