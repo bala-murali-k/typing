@@ -2,14 +2,28 @@
 import { Box, useTheme, Grid } from '@mui/material'
 import { useContext } from 'react'
 import { ThemeContext } from '../../../context/theme/theme.context.component'
-// Required objects
 
-export function FeaturesSectionHomePageComponent ({  }) {
+// Define feature item interface
+interface Feature {
+    icon: string
+    title: string
+    description: string
+}
+
+export function FeaturesSectionHomePageComponent() {
+    // Fix Issue 1: Handle null context
+    const themeContext = useContext(ThemeContext)
     
-    const { currentTheme } = useContext(ThemeContext)
-    const theme = useTheme()
+    // Throw error if context is null (should never happen if used within provider)
+    if (!themeContext) {
+        throw new Error('FeaturesSectionHomePageComponent must be used within a ThemeContextComponent')
+    }
+    
+    const { currentTheme } = themeContext
+    const muiTheme = useTheme()
 
-    const getFeatureIconGradient = () => {
+    // Helper function with proper return type
+    const getFeatureIconGradient = (): string => {
         switch (currentTheme) {
             case 'dark':
                 return 'linear-gradient(145deg, #818cf8, #c084fc)'
@@ -20,7 +34,8 @@ export function FeaturesSectionHomePageComponent ({  }) {
         }
     }
 
-    const features = [
+    // Fix Issue 2: Properly type the features array
+    const features: Feature[] = [
         { icon: 'speed', title: 'Real-time WPM', description: 'Live words per minute as you type.' },
         { icon: 'track_changes', title: 'Accuracy analytics', description: 'Correct/incorrect highlights.' },
         { icon: 'layers', title: 'Difficulty levels', description: 'Easy, medium, hard paragraphs.' },
@@ -31,40 +46,42 @@ export function FeaturesSectionHomePageComponent ({  }) {
     
     return (
         <Box sx={{ width: '100%' }}>
-
             <Box sx={{ mt: 8, mb: 6 }}>
                 <Box
                     component="h2"
                     id="features"
                     sx={{
-                        fontFamily: theme.typography.fontFamily,
+                        fontFamily: muiTheme.typography.fontFamily,
                         fontSize: { xs: '2rem', md: '2.2rem' },
                         fontWeight: 700,
                         textAlign: 'center',
-                        color: theme.palette.text.primary,
+                        color: muiTheme.palette.text.primary,
                         mb: 4,
-                        letterSpacing: theme.typography.h2?.letterSpacing || '-0.02em'
+                        letterSpacing: muiTheme.typography.h2?.letterSpacing || '-0.02em'
                     }}
                 >
                     Why you'll love it
                 </Box>
 
+                {/* Fix Issue 3: Fix Grid implementation - MUI v5 uses different Grid props */}
                 <Grid container spacing={3}>
                     {features.map((feature, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={index}>
+                        // In MUI v5, Grid item uses the 'grid' prop pattern
+                        <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
                             <Box
                                 className="feature-card"
                                 sx={{
-                                    background: theme.palette.background.paper,
+                                    background: muiTheme.palette.background.paper,
                                     borderRadius: '2rem',
                                     padding: '2rem 1.5rem',
                                     border: '1px solid',
-                                    borderColor: theme.palette.divider,
-                                    boxShadow: theme.shadows[2],
+                                    borderColor: muiTheme.palette.divider,
+                                    boxShadow: muiTheme.shadows[2],
                                     transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                                    height: '100%', // Make cards equal height
                                     '&:hover': {
                                         transform: 'translateY(-6px)',
-                                        boxShadow: theme.shadows[8]
+                                        boxShadow: muiTheme.shadows[8]
                                     }
                                 }}
                             >
@@ -89,10 +106,10 @@ export function FeaturesSectionHomePageComponent ({  }) {
                                 <Box
                                     component="h3"
                                     sx={{
-                                        fontFamily: theme.typography.fontFamily,
-                                        fontSize: theme.typography.h6?.fontSize || '1.25rem',
+                                        fontFamily: muiTheme.typography.fontFamily,
+                                        fontSize: muiTheme.typography.h6?.fontSize || '1.25rem',
                                         fontWeight: 600,
-                                        color: theme.palette.text.primary,
+                                        color: muiTheme.palette.text.primary,
                                         mb: 1,
                                         lineHeight: 1.4,
                                         letterSpacing: 'normal'
@@ -103,10 +120,10 @@ export function FeaturesSectionHomePageComponent ({  }) {
                                 <Box
                                     component="p"
                                     sx={{
-                                        fontFamily: theme.typography.fontFamily,
+                                        fontFamily: muiTheme.typography.fontFamily,
                                         fontSize: '0.95rem',
                                         fontWeight: 400,
-                                        color: theme.palette.text.secondary,
+                                        color: muiTheme.palette.text.secondary,
                                         lineHeight: 1.6,
                                         m: 0,
                                         letterSpacing: 'normal'
