@@ -356,7 +356,7 @@ export default function MainLayout() {
             <Tooltip title="GitHub">
               <IconButton
                 component="a"
-                href="#"
+                href="https://github.com/bala-murali-k/typing"
                 target="_blank"
                 rel="noopener noreferrer"
                 size="small"
